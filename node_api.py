@@ -261,8 +261,9 @@ class Node:
             o_connection.render()
 
 
-user32 = ctypes.windll.user32
-screensize = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
+# user32 = ctypes.windll.user32
+# screensize = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
+screensize = (800,800)
 
 pygame.font.init()
 node_header_font = pygame.font.SysFont("Calibri", 20)

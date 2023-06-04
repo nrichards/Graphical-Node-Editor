@@ -15,6 +15,8 @@ from threading import Thread
 from tkinter.filedialog import asksaveasfilename, askopenfilename
 from tkinter import messagebox
 from tkinter import colorchooser
+from tkinter import Menubutton
+from tkinter import Button
 
 # check if app is being compiled with PyInstaller or py2exe
 if hasattr(sys, '_MEIPASS'):
@@ -40,8 +42,8 @@ class App(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Node Editor")
-        self.iconbitmap(default=os.path.join(application_path, icon_file))
-        self.state("zoomed")
+        # self.iconbitmap(default=os.path.join(application_path, icon_file))
+        # self.state("zoomed")
         self.protocol("WM_DELETE_WINDOW", self.confirm_quit)
         toolbar = tk.Menu(self)
         toolbar.add_command(label="Exit", command=self.confirm_quit)
@@ -50,12 +52,24 @@ class App(tk.Tk):
         toolbar.add_command(label="Import", command=self.import_file)
         toolbar.add_command(label="Export", command=self.export)
         self.config(menu=toolbar)
+        menubutton = Menubutton(self)
+        menubutton.pack()
+        button = Button(menubutton, text="Exit", command=self.confirm_quit)
+        button.pack()
+        button = Button(menubutton, text="New Node", command=self.create_new_node)
+        button.pack()
+        button = Button(menubutton, text="Edit Node", command=self.edit_node)
+        button.pack()
+        button = Button(menubutton, text="Import", command=self.import_file)
+        button.pack()
+        button = Button(menubutton, text="Export", command=self.export)
+        button.pack()
 
         # embed pygame window
         pygame_embed = tk.Frame(self, width=self.winfo_screenwidth(), height=self.winfo_screenheight())
         pygame_embed.pack()
         os.environ['SDL_WINDOWID'] = str(pygame_embed.winfo_id())
-        os.environ['SDL_VIDEODRIVER'] = 'windib'
+        # os.environ['SDL_VIDEODRIVER'] = 'windib'
 
         self.update_idletasks()
 
@@ -741,16 +755,19 @@ class App(tk.Tk):
 
 
 app = App()
-
+screen_size = (800,800)
 
 def pygame_loop():
-    screen = pygame.display.set_mode((app.winfo_screenwidth(), app.winfo_screenheight()))
-    pygame.display.init()
-    pygame.display.update()
-    node_api.init(screen)
+    # screen = pygame.display.set_mode((app.winfo_screenwidth(), app.winfo_screenheight()))
+    # screen = pygame.display.set_mode(screen_size)
+    # pygame.display.init()
+    # pygame.display.update()
+    # node_api.init(screen)
 
-    running = True
-    while running:
+    # running = True
+    # while running:
+    global running
+    if running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -758,13 +775,22 @@ def pygame_loop():
         screen.fill((34, 34, 34))
 
         mouse = pygame.mouse.get_pressed()
+        print(pygame.mouse.get_pos())
         node_api.update(mouse)
         node_api.render_all()
 
         pygame.display.update()
-    pygame.quit()
+        app.update()
+        app.after(100, pygame_loop)
+    # pygame.quit()
 
-
-pygame_thread = Thread(target=pygame_loop, daemon=True)
-pygame_thread.start()
+running = True
+screen = pygame.display.set_mode(screen_size)
+pygame.display.init()
+pygame.display.update()
+node_api.init(screen)
+pygame_loop()
+# pygame_thread = Thread(target=pygame_loop, daemon=True)
+# # pygame_thread = Thread(target=pygame_loop)
+# pygame_thread.start()
 app.mainloop()
